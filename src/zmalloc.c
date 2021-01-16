@@ -4,36 +4,6 @@
  * @date 2021/1/15
  */
 
-/* zmalloc - total amount of allocated memory aware version of malloc()
- *
- * Copyright (c) 2009-2010, Salvatore Sanfilippo <antirez at gmail dot com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of Redis nor the names of its contributors may be used
- *     to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -145,37 +115,37 @@ void *zmalloc(size_t size)
         *((size_t *) ptr) = size;
         /*更新已经使用的内存大小 全局量*/
         update_zmalloc_stat_alloc(size + PREFIX_SIZE);
-                /*向右偏移PREFIX_SIZE 此时指针指向的空间大小就是size*/
-                //     +--------------+-----------------+
-                //     | PREFIX_SIZE  | size            |
-                //     +--------------+-----------------+
-                //     ^              ^
-                //     |              |
-                //    ptr            (char*)ptr+PREFIX_SIZE
+        /*向右偏移PREFIX_SIZE 此时指针指向的空间大小就是size*/
+        //     +--------------+-----------------+
+        //     | PREFIX_SIZE  | size            |
+        //     +--------------+-----------------+
+        //     ^              ^
+        //     |              |
+        //    ptr            (char*)ptr+PREFIX_SIZE
+        return (char *) ptr + PREFIX_SIZE;
+#endif
+}
+
+
+void *zcalloc(size_t size)
+{
+        /*
+         * calloc是线程安全函数
+         * 分配的内存大小为 num*size
+         * 并初始化为0
+         */
+        void *ptr = calloc(1, size + PREFIX_SIZE);
+
+        if (!ptr) zmalloc_oom_handler(size);
+#ifdef HAVE_MALLOC_SIZE
+        update_zmalloc_stat_alloc(zmalloc_size(ptr));
+        return ptr;
+#else
+        *((size_t *) ptr) = size;
+        update_zmalloc_stat_alloc(size + PREFIX_SIZE);
                 return (char *) ptr + PREFIX_SIZE;
 #endif
         }
-
-
-        void *zcalloc(size_t size)
-        {
-                /*
-                 * calloc是线程安全函数
-                 * 分配的内存大小为 num*size
-                 * 并初始化为0
-                 */
-                void *ptr = calloc(1, size + PREFIX_SIZE);
-
-                if (!ptr) zmalloc_oom_handler(size);
-#ifdef HAVE_MALLOC_SIZE
-                update_zmalloc_stat_alloc(zmalloc_size(ptr));
-                return ptr;
-#else
-                *((size_t *) ptr) = size;
-                update_zmalloc_stat_alloc(size + PREFIX_SIZE);
-                        return (char *) ptr + PREFIX_SIZE;
-#endif
-                }
 
 /*重新分配内存*/
 void *zrealloc(void *ptr, size_t size)
@@ -214,7 +184,7 @@ void *zrealloc(void *ptr, size_t size)
         update_zmalloc_stat_alloc(size);
                 return (char *) newptr + PREFIX_SIZE;
 #endif
-        }
+}
 
 /* Provide zmalloc_size() for systems where this function is not provided by
  * malloc itself, given that in that case we store a header with this
@@ -369,36 +339,16 @@ size_t zmalloc_get_rss(void) {
     rss *= page;
     return rss;
 }
-#elif defined(HAVE_TASKINFO)
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/sysctl.h>
-#include <mach/task.h>
-#include <mach/mach_init.h>
-
-                        size_t zmalloc_get_rss(void) {
-                            task_t task = MACH_PORT_NULL;
-                            struct task_basic_info t_info;
-                            mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
-
-                            if (task_for_pid(current_task(), getpid(), &task) != KERN_SUCCESS)
-                                return 0;
-                            task_info(task, TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
-
-                            return t_info.resident_size;
-                        }
 #else
 size_t zmalloc_get_rss(void)
-                        {
-                                /* If we can't get the RSS in an OS-specific way for this system just
-                                 * return the memory usage we estimated in zmalloc()..
-                                 *
-                                 * Fragmentation will appear to be always 1 (no fragmentation)
-                                 * of course... */
-                                return zmalloc_used_memory();
-                        }
+{
+        /* If we can't get the RSS in an OS-specific way for this system just
+         * return the memory usage we estimated in zmalloc()..
+         *
+         * Fragmentation will appear to be always 1 (no fragmentation)
+         * of course... */
+        return zmalloc_used_memory();
+}
 #endif
 
 /*
