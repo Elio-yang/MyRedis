@@ -5,8 +5,8 @@
  * @date 2021/1/15
  */
 
-#ifndef MY_REDIS_ADLIST_H
-#define MY_REDIS_ADLIST_H
+#ifndef __ADLIST_H
+#define __ADLIST_H
 
 /*list node*/
 typedef struct listNode{
@@ -94,4 +94,4 @@ void listRotate(list *list);
 /*from tail to head*/
 #define AL_START_TAIL 1
 
-#endif //MY_REDIS_ADLIST_H
+#endif //__ADLIST_H
