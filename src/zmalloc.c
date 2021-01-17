@@ -1,7 +1,8 @@
-/* memory allocating related
+/* zmalloc.c  memory allocation related implementation
  * @author Elio Yang
  * @email  jluelioyang2001@gamil.com
  * @date 2021/1/15
+ * @update 2021/1/17
  */
 
 #include <stdio.h>
@@ -94,6 +95,8 @@ static void (*zmalloc_oom_handler)(size_t) = zmalloc_default_oom;
  * zmalloc ， zcalloc ，zrealloc
  * 都申请了多一个PREFIX_SZIE 的内存大小，并与字长对齐
  */
+
+/*申请size大小的内存，并多申请一块内存保存size*/
 void *zmalloc(size_t size)
 {
         /*size 为实际需要的大小
