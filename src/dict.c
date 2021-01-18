@@ -64,13 +64,13 @@ static int dict_can_resize = 1;
 static unsigned int dict_force_resize_ratio = 5;
 
 /* -------------------------- private prototypes ----------------------------*/
-
+/*是否需要扩展*/
 static int _dictExpandIfNeeded(dict *ht);
-
+/*生成下一个2的整数次幂*/
 static unsigned long _dictNextPower(unsigned long size);
-
+/*获得索引*/
 static int _dictKeyIndex(dict *ht, const void *key);
-
+/*初始化字典*/
 static int _dictInit(dict *ht, dictType *type, void *privDataPtr);
 
 /*----------------------------hash functions---------------------------------*/
