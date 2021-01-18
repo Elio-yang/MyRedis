@@ -11,6 +11,7 @@
 #define __xstr(s) __str(s)
 #define __str(s) #s
 
+#define ZMALLOC(n, type) (zmalloc((sizeof(type))*(n)))
 
 void *zmalloc(size_t size);
 void *zcalloc(size_t size);

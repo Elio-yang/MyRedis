@@ -7,4 +7,8 @@
 #ifndef MY_REDIS_MACROS_H
 #define MY_REDIS_MACROS_H
 
+#define nullptr NULL
+
+
+
 #endif //MY_REDIS_MACROS_H
