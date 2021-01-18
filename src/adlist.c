@@ -7,9 +7,8 @@
 #include "adlist.h"
 #include "zmalloc.h"
 #include <stdlib.h>
+#include "macros.h"
 
-#define nullptr NULL
-#define ZMALLOC(n, type) (zmalloc((sizeof(type))*(n)))
 
 /*create a list*/
 list *listCreate(void)
