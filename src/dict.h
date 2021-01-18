@@ -201,7 +201,7 @@ typedef void (dictScanFunction)(void *privdata,const dictEntry *de);
 // 返回字典的已有节点数量
 #define dictSize(d) ((d)->ht[0].used+(d)->ht[1].used)
 // 查看字典是否正在 rehash
-#define dictIsRehashing(ht) ((ht)->rehashidx != -1)
+#define dictIsRehashing(d) ((d)->rehashidx != -1)
 
 
 /*---------------------------------API---------------------------------*/

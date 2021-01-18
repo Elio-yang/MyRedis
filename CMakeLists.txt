@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(MY_REDIS)
 
-set(CMAKE_C_STANDARD 99)
+add_definitions(-std=gnu99 -D_GNU_SOURCE)
 
 # 遍历项目(三级目录)所有的 .cpp 文件
 #file (GLOB files *.cpp */*.cpp */*/*.cpp )
