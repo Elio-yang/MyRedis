@@ -40,6 +40,28 @@ typedef struct list{
         unsigned long len;
 }list;
 
+/*
+                                                 +-------+       +-------+
+                                       NULL<-----|-prev  |<------|-prev  |
+						 +-------+	 +-------+
+                  list structure		 | next--|------>| next--|----->NULL
+                                                 +-------+       +-------+
+		+------------------------+       | void* |	 | void* |<---+
+		|  	head       ------|------>+-------+	 +-------+    |
+		+------------------------+				      |
+		|  	tail       ------|------------------------------------+
+		+------------------------+
+		|  void(*dup)(void *) 	 |
+		+------------------------+
+		| void(*free)(void *)    |
+		+------------------------+
+		|int(*match)(void*,void*)|
+		+------------------------+
+		|  		len      |
+		+------------------------+
+
+*/
+
 
 /*
  * Macros as functions
@@ -65,9 +87,7 @@ typedef struct list{
 #define listGetFreeMethod(l) ((l)->free)
 #define listGetMatchMethod(l) ((l)->match)
 
-/*
- * API
- */
+/*------------------------------------API---------------------------------*/
 
 list *listCreate(void);
 void listRelease(list *list);

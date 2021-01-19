@@ -8,6 +8,9 @@
 #define __ZMALLOC_H
 
 /*stringfication*/
+#include <stdint.h>
+#include <stddef.h>
+
 #define __xstr(s) __str(s)
 #define __str(s) #s
 

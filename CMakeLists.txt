@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.15)
 project(MY_REDIS)
 
-add_definitions(-std=gnu99 -D_GNU_SOURCE)
-
+add_definitions(-std=c99)
+add_definitions(-lpthread)
 # 遍历项目(三级目录)所有的 .cpp 文件
 #file (GLOB files *.cpp */*.cpp */*/*.cpp )
-file (GLOB_RECURSE files *.c)
-foreach (file ${files})
-    string(REGEX REPLACE ".+/(.+)\\..*" "\\1" exe ${file})
-    add_executable (${exe} ${file})
-    message (\ \ \ \ --\ src/${exe}.c\ will\ be\ compiled\ to\ bin/${exe})
-endforeach ()
+#file (GLOB_RECURSE files *.c)
+#foreach (file ${files})
+#    string(REGEX REPLACE ".+/(.+)\\..*" "\\1" exe ${file})
+    #add_executable (${exe} ${file})
+    #message (\ \ \ \ --\ src/${exe}.c\ will\ be\ compiled\ to\ bin/${exe})
+#endforeach ()
 #file (GLOB_RECURSE files *.cpp)
+add_executable(list_test src/main.c src/adlist.h src/adlist.c src/zmalloc.c src/zmalloc.h)
